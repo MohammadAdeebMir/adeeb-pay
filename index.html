@@ -5,58 +5,133 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pay Adeeb Mir</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
-    background: #000;
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
+*{box-sizing:border-box}
 
-  .card {
-    background: #111;
-    padding: 40px;
-    border-radius: 24px;
-    text-align: center;
-    width: 90%;
-    max-width: 380px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-  }
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:radial-gradient(circle at top,#0f0f0f,#000);
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+}
 
-  .title {
-    font-size: 26px;
-    font-weight: 600;
-    margin-bottom: 10px;
-  }
+/* Glass shine animation */
+@keyframes shine{
+  0%{transform:translateX(-120%)}
+  100%{transform:translateX(120%)}
+}
 
-  .upi {
-    opacity: 0.7;
-    margin-bottom: 30px;
-    font-size: 14px;
-  }
+.card{
+  position:relative;
+  overflow:hidden;
+  width:92%;
+  max-width:420px;
+  padding:34px;
+  border-radius:28px;
+  text-align:center;
+  backdrop-filter:blur(18px);
+  background:linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 25px 80px rgba(0,0,0,0.65),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
 
-  .pay-btn {
-    display: block;
-    width: 100%;
-    padding: 18px;
-    border-radius: 14px;
-    border: none;
-    font-size: 18px;
-    font-weight: 600;
-    background: linear-gradient(135deg, #00c853, #00e676);
-    color: black;
-    cursor: pointer;
-  }
+/* moving shine */
+.card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:40%;
+  height:100%;
+  background:linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.25),
+    transparent
+  );
+  animation:shine 4s infinite;
+}
 
-  .note {
-    margin-top: 20px;
-    font-size: 12px;
-    opacity: 0.6;
-  }
+.title{
+  font-size:28px;
+  font-weight:700;
+}
+
+.upi{
+  margin:6px 0 24px;
+  font-size:13px;
+  opacity:.65;
+}
+
+.amount-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.amt-btn{
+  padding:12px 0;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.04);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.amt-btn:hover{
+  background:rgba(255,255,255,0.14);
+  transform:translateY(-1px);
+}
+
+.custom{
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  margin-bottom:14px;
+  font-size:16px;
+  text-align:center;
+  outline:none;
+  background:rgba(255,255,255,0.08);
+  color:#fff;
+}
+
+.pay-btn{
+  width:100%;
+  padding:18px;
+  border-radius:16px;
+  border:none;
+  font-size:18px;
+  font-weight:700;
+  background:linear-gradient(135deg,#00e676,#00c853);
+  color:#000;
+  cursor:pointer;
+  transition:.2s ease;
+  box-shadow:0 10px 30px rgba(0,230,118,.35);
+  margin-bottom:10px;
+}
+
+.pay-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 14px 40px rgba(0,230,118,.45);
+}
+
+.note{
+  margin-top:10px;
+  font-size:12px;
+  opacity:.5;
+}
 </style>
 </head>
 
@@ -66,18 +141,64 @@
   <div class="title">Pay Adeeb Mir</div>
   <div class="upi">7051785099@fam</div>
 
-  <button class="pay-btn" onclick="payNow()">
-    Pay with UPI
+  <div class="amount-grid">
+    <button class="amt-btn" onclick="setAmt(10)">₹10</button>
+    <button class="amt-btn" onclick="setAmt(20)">₹20</button>
+    <button class="amt-btn" onclick="setAmt(50)">₹50</button>
+    <button class="amt-btn" onclick="setAmt(100)">₹100</button>
+    <button class="amt-btn" onclick="setAmt(200)">₹200</button>
+    <button class="amt-btn" onclick="setAmt(500)">₹500</button>
+    <button class="amt-btn" onclick="setAmt(1000)">₹1000</button>
+    <button class="amt-btn" onclick="setAmt('')">Clear</button>
+  </div>
+
+  <input id="amt" class="custom" placeholder="Enter custom amount (₹)">
+
+  <button class="pay-btn" onclick="payNow(true)">
+    Pay Custom Amount
   </button>
 
-  <div class="note">Tap → Enter amount → Pay</div>
+  <button class="pay-btn" onclick="payNow(false)">
+    Quick Pay
+  </button>
+
+  <div class="note">Secure • Fast • Tap & Pay</div>
 </div>
 
 <script>
-function payNow() {
-  const upi =
-    "upi://pay?pa=7051785099@fam&pn=Adeeb%20Mir&cu=INR";
-  window.location.href = upi;
+function playFeedback(){
+  try{
+    navigator.vibrate?.(40);
+  }catch(e){}
+
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator();
+    const g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value=900;
+    g.gain.value=0.05;
+    o.start();
+    setTimeout(()=>o.stop(),80);
+  }catch(e){}
+}
+
+function setAmt(v){
+  document.getElementById("amt").value=v;
+  playFeedback();
+}
+
+function payNow(useCustom){
+  playFeedback();
+
+  let amount=document.getElementById("amt").value.trim();
+  let url="upi://pay?pa=7051785099@fam&pn=Adeeb%20Mir&cu=INR";
+
+  if(useCustom && amount!==""){
+    url+="&am="+amount;
+  }
+
+  window.location.href=url;
 }
 </script>
 
