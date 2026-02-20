@@ -13,7 +13,7 @@
 body{
   margin:0;
   font-family:'Poppins',sans-serif;
-  background:radial-gradient(circle at top,#0f0f0f,#000);
+  background:radial-gradient(circle at top,#0a0a0a,#000);
   color:#fff;
   display:flex;
   justify-content:center;
@@ -21,10 +21,11 @@ body{
   min-height:100vh;
 }
 
-/* Glass shine animation */
-@keyframes shine{
-  0%{transform:translateX(-120%)}
-  100%{transform:translateX(120%)}
+/* animated glow */
+@keyframes glowMove{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
 }
 
 .card{
@@ -33,31 +34,25 @@ body{
   width:92%;
   max-width:420px;
   padding:34px;
-  border-radius:28px;
+  border-radius:30px;
   text-align:center;
-  backdrop-filter:blur(18px);
+  backdrop-filter:blur(20px);
   background:linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));
   border:1px solid rgba(255,255,255,0.08);
-  box-shadow:
-    0 25px 80px rgba(0,0,0,0.65),
-    inset 0 1px 0 rgba(255,255,255,0.06);
+  box-shadow:0 30px 90px rgba(0,0,0,.7);
 }
 
-/* moving shine */
+/* premium shine */
 .card::before{
   content:"";
   position:absolute;
-  top:0;
-  left:0;
-  width:40%;
-  height:100%;
-  background:linear-gradient(
-    120deg,
-    transparent,
-    rgba(255,255,255,0.25),
-    transparent
-  );
-  animation:shine 4s infinite;
+  inset:-2px;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.25),transparent);
+  transform:translateX(-120%);
+  animation:shine 5s infinite;
+}
+@keyframes shine{
+  to{transform:translateX(120%)}
 }
 
 .title{
@@ -75,22 +70,21 @@ body{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:10px;
-  margin-bottom:20px;
+  margin-bottom:18px;
 }
 
 .amt-btn{
   padding:12px 0;
   border-radius:14px;
-  border:1px solid rgba(255,255,255,0.12);
-  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);
   color:#fff;
   font-weight:600;
   cursor:pointer;
-  transition:.18s ease;
+  transition:.18s;
 }
-
 .amt-btn:hover{
-  background:rgba(255,255,255,0.14);
+  background:rgba(255,255,255,.16);
   transform:translateY(-1px);
 }
 
@@ -99,14 +93,15 @@ body{
   padding:14px;
   border-radius:14px;
   border:none;
-  margin-bottom:14px;
+  margin-bottom:12px;
   font-size:16px;
   text-align:center;
   outline:none;
-  background:rgba(255,255,255,0.08);
+  background:rgba(255,255,255,.08);
   color:#fff;
 }
 
+/* animated pay button */
 .pay-btn{
   width:100%;
   padding:18px;
@@ -114,23 +109,25 @@ body{
   border:none;
   font-size:18px;
   font-weight:700;
-  background:linear-gradient(135deg,#00e676,#00c853);
+  background:linear-gradient(270deg,#00e676,#00c853,#00e676);
+  background-size:300% 300%;
+  animation:glowMove 3s ease infinite;
   color:#000;
   cursor:pointer;
-  transition:.2s ease;
-  box-shadow:0 10px 30px rgba(0,230,118,.35);
+  box-shadow:0 15px 40px rgba(0,230,118,.45);
   margin-bottom:10px;
-}
-
-.pay-btn:hover{
-  transform:translateY(-1px);
-  box-shadow:0 14px 40px rgba(0,230,118,.45);
 }
 
 .note{
   margin-top:10px;
   font-size:12px;
   opacity:.5;
+}
+
+.install{
+  margin-top:10px;
+  font-size:12px;
+  opacity:.6;
 }
 </style>
 </head>
@@ -152,25 +149,19 @@ body{
     <button class="amt-btn" onclick="setAmt('')">Clear</button>
   </div>
 
-  <input id="amt" class="custom" placeholder="Enter custom amount (₹)">
+  <input id="amt" class="custom" placeholder="Enter amount (₹)">
 
-  <button class="pay-btn" onclick="payNow(true)">
-    Pay Custom Amount
-  </button>
-
-  <button class="pay-btn" onclick="payNow(false)">
-    Quick Pay
+  <button class="pay-btn" onclick="startPay()">
+    Pay with UPI
   </button>
 
   <div class="note">Secure • Fast • Tap & Pay</div>
+  <div class="install" id="fallback"></div>
 </div>
 
 <script>
-function playFeedback(){
-  try{
-    navigator.vibrate?.(40);
-  }catch(e){}
-
+function feedback(){
+  try{navigator.vibrate?.(40);}catch(e){}
   try{
     const ctx=new (window.AudioContext||window.webkitAudioContext)();
     const o=ctx.createOscillator();
@@ -185,20 +176,40 @@ function playFeedback(){
 
 function setAmt(v){
   document.getElementById("amt").value=v;
-  playFeedback();
+  feedback();
 }
 
-function payNow(useCustom){
-  playFeedback();
+function isAndroid(){
+  return /Android/i.test(navigator.userAgent);
+}
+
+function isiOS(){
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+function startPay(){
+  feedback();
 
   let amount=document.getElementById("amt").value.trim();
-  let url="upi://pay?pa=7051785099@fam&pn=Adeeb%20Mir&cu=INR";
+  let upi="upi://pay?pa=7051785099@fam&pn=Adeeb%20Mir&cu=INR";
 
-  if(useCustom && amount!==""){
-    url+="&am="+amount;
+  if(amount!=="") upi+="&am="+amount;
+
+  if(isAndroid()){
+    window.location.href=upi;
+
+    // fallback if blocked
+    setTimeout(()=>{
+      document.getElementById("fallback").innerHTML=
+        "If payment app didn't open, install Google Pay / PhonePe.";
+    },1500);
+
+  }else if(isiOS()){
+    // iPhone fallback
+    window.location.href="https://pay.google.com/";
+  }else{
+    window.location.href=upi;
   }
-
-  window.location.href=url;
 }
 </script>
 
